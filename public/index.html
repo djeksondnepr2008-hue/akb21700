@@ -252,8 +252,40 @@ body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
     <div class="legend" id="legend"></div>
   </section>
 
+  <section class="panel" aria-labelledby="h-wrap">
+    <h2 id="h-wrap"><span class="n">8</span>Ізоляція й термоусадка</h2>
+    <div class="fields">
+      <label>BMS кладемо на бік, товщина з дротами, мм<input id="bmsT" type="number" min="0" max="40" step="1" value="10"></label>
+      <label>Піна EVA на торцях, мм (0 — без)<input id="foamT" type="number" min="0" max="10" step="0.5" value="2"></label>
+    </div>
+    <div class="scroll" style="margin-top:12px"><table id="wrapTable"></table></div>
+    <div class="grid2" style="margin-top:14px">
+      <div>
+        <h3 class="sub">Порядок обгортання</h3>
+        <ol class="list">
+          <li>Кільця на всі плюсові торці ще до зварювання стрічки.</li>
+          <li>Після зварювання — торцеві листи з фіш-паперу або електрокартону поверх стрічки. Вирізи тільки під балансувальні дроти й виводи.</li>
+          <li>Бокова обгортка з картону навколо цеглини: захищає плівку комірок від тертя об стрічку, BMS і дроти.</li>
+          <li>BMS — на лист ізоляції, дроти закріпити каптоновим або скловолоконним скотчем, щоб не перетиралися об краї.</li>
+          <li>Піна на торці (за бажанням) — гасить вібрацію і удари.</li>
+          <li>Термоусадка: перший шар уздовж найдовшої сторони, другий — упоперек, щоб закрити торці першого.</li>
+        </ol>
+      </div>
+      <div>
+        <h3 class="sub">Як усаджувати</h3>
+        <ol class="list">
+          <li>Технічний фен на 120–150 °C, рухайте весь час. Почніть із середини, потім до країв, щоб не залишити повітря.</li>
+          <li>Не грійте довго одне місце: усередині комірки, плівка комірок теж усідає, а BMS не любить нагріву.</li>
+          <li>Перш ніж усаджувати, проріжте або залиште отвори під роз'єм, балансувальний роз'єм і вимикач.</li>
+          <li>Ширина в таблиці — у плоскому стані (як продається). ПВХ усідає приблизно вдвічі, тому береться трохи більша за напівпериметр перетину.</li>
+          <li>Для велосипеда, самоката й іншої вібрації — два шари і жорсткий корпус або сумка. Термоусадка не захищає від удару й проколу.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
   <section class="panel" aria-labelledby="h-safe">
-    <h2 id="h-safe"><span class="n">8</span>Перед зварюванням</h2>
+    <h2 id="h-safe"><span class="n">9</span>Перед зварюванням</h2>
     <ul class="list">
       <li>Зарядіть або розрядіть усі комірки до однієї напруги: різниця в групі не більше 0,05 В. Інакше в момент з'єднання між ними піде великий струм вирівнювання.</li>
       <li>Зварюйте контактним зварюванням. Паяльник перегріває комірку і пошкоджує її.</li>
@@ -276,6 +308,11 @@ var PRESETS = [
   { id: "40T",   name: "Samsung INR21700-40T", cap: 4000, amax: 35,   vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 67, note: "Струмова: 35 А." },
   { id: "P42A",  name: "Molicel INR-21700-P42A", cap: 4200, amax: 45, vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 70, note: "Струмова: 45 А за даташитом, але це не справжній тривалий режим; ресурс на великих струмах падає." },
   { id: "P45B",  name: "Molicel INR-21700-P45B", cap: 4500, amax: 45, vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 70, note: "Струмова: 45 А до відсічки 80 °C; повністю розрядити на такому струмі не можна." },
+  { id: "EVE50E",  name: "EVE INR21700-50E",  cap: 5000, amax: 10, vnom: 3.6, vmax: 4.2, vmin: 2.5, mass: 69, note: "Ємнісна. За даташитом 15 А тривало, але на 15 А комірка перегрівається понад 60 °C; реально тривало ≈10 А (15 А лише короткочасно)." },
+  { id: "EVE58E",  name: "EVE INR21700-58E",  cap: 5700, amax: 10, vnom: 3.6, vmax: 4.2, vmin: 2.5, mass: 72, note: "Максимальна ємність. За даташитом до 16,8 А, але для ресурсу й нагріву тримайте ≤10 А. Не використовуйте як струмову. Масу вказано орієнтовно." },
+  { id: "EVE40P",  name: "EVE INR21700-40P",  cap: 4000, amax: 35, vnom: 3.6, vmax: 4.2, vmin: 2.5, mass: 68, note: "Струмова, клас Samsung 40T / Molicel P42A: 35 А тривало, 50 А лише з відсічкою за 80 °C." },
+  { id: "EVE40PL", name: "EVE INR21700-40PL", cap: 4000, amax: 40, vnom: 3.6, vmax: 4.2, vmin: 2.5, mass: 68, note: "Безтабова струмова. 70 А в даташиті обмежене температурою (відсічка 75–80 °C); справжній тривалий струм за незалежними тестами ≈40–50 А. Беремо 40 А." },
+  { id: "EVE50PL", name: "EVE INR21700-50PL", cap: 5000, amax: 50, vnom: 3.6, vmax: 4.2, vmin: 2.5, mass: 70, note: "Безтабова струмова з великою ємністю. 125 А — короткочасний режим з обмеженням до 80 °C; тривало ≈50 А (оцінка незалежного тесту). Масу вказано орієнтовно. Остерігайтеся підробок." },
   { id: "custom", name: "Інша (ввести вручну)", cap: 4500, amax: 15, vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 70, note: "Введіть дані з даташита своєї комірки." }
 ];
 var S_PRESETS = [[3, "11,1 В"], [4, "14,8 В"], [6, "22,2 В"], [7, "25,9 В"], [10, "36 В"], [13, "48 В"], [14, "52 В"], [16, "60 В"], [20, "72 В"]];
@@ -430,6 +467,7 @@ function render() {
     "<tr><th>Нікель</th><td>див. розділ «Нікелева стрічка» нижче</td></tr>" +
     "<tr><th>Балансувальні дроти</th><td>" + (r.S + 1) + " шт. (B0…B" + r.S + "), 22–24 AWG</td></tr>";
   renderNickel(r, iDesign);
+  renderWrap(r);
   renderGroups(r);
   save();
 }
@@ -462,6 +500,50 @@ function renderNickel(r, iDesign) {
     " шар(и) або перехід на мідну шину чи дріт. Якби на кожному стику була лише одна перемичка, вона мала б нести " + fmt(iDesign, 0) +
     " А і вимагала б " + endLayers + " шарів, тому перемички ставимо по всіх " + r.P + " рядах." +
     (mat.id === "steel" ? " <b>Нікельована сталь</b> має в кілька разів вищий опір і гріється; для силових збірок не годиться." : "");
+}
+
+
+// ---------- Ізоляція й термоусадка ----------
+// ПВХ-термоусадка для АКБ: стандартні ширини в плоскому стані, мм
+var SHRINK = [30, 40, 50, 60, 70, 80, 85, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 200, 220, 230, 250, 280, 300, 330, 350, 380, 400, 450, 500, 550, 600];
+function pickShrink(a, b) {               // a, b — сторони перетину, навколо якого йде рукав
+  var hp = a + b, need = Math.max(hp * 1.1, hp + 10);
+  var f = SHRINK.find(function (x) { return x >= need; });
+  return { hp: hp, need: need, flat: f || null };
+}
+function renderWrap(r) {
+  var st = STRIPS.find(function (x) { return x.id === $("niStrip").value; }) || STRIPS[0];
+  var paper = 0.5, bmsT = Math.max(0, num("bmsT") || 0), foamT = Math.max(0, num("foamT") || 0);
+  var layers = r.layers || 1;
+  var W0 = r.w, H0 = r.h, L0 = r.l;
+  // торці: стрічка (шари) + фіш-папір + піна; боки: картон
+  var L = L0 + 2 * (layers * st.t + paper + foamT);
+  var W = W0 + 2 * paper, H = H0 + 2 * paper;
+  // BMS кладемо на найбільшу бічну грань -> додає до меншої з W/H
+  var bmsOn = W >= H ? "H" : "W";
+  if (bmsOn === "H") H += bmsT + paper; else W += bmsT + paper;
+  var d = [W, H, L].sort(function (a, b) { return b - a; }); // d[0] найдовша
+  var s1 = pickShrink(d[1], d[2]);
+  var over1 = Math.max(15, d[2] * 0.5);
+  var len1 = (d[0] + 2 * over1) * 1.08;
+  var s2 = pickShrink(d[0], d[2]);
+  var over2 = Math.max(15, d[2] * 0.5);
+  var len2 = (d[1] + 2 * over2) * 1.08;
+  var heavy = r.packMass > 1;
+  var rings = Math.ceil(r.n * 1.1);
+  function fl(s) { return s.flat ? "<b>" + s.flat + " мм</b>" : "<span class='pill bad'>ширше 600 мм</span> — замовте листову або обгорніть плівкою"; }
+  function mm(x) { return fmt(Math.ceil(x), 0); }
+  $("wrapTable").innerHTML =
+    "<tr><th>Габарит у зборі (без термоусадки)</th><td class='num'><b>" + mm(W) + " × " + mm(H) + " × " + mm(L) + " мм</b> <span class='ids'>(цеглина " + mm(W0) + "×" + mm(H0) + "×" + mm(L0) + " + стрічка, картон, BMS, піна)</span></td></tr>" +
+    "<tr><th>Ізоляційні кільця 21700 на плюс</th><td>" + rings + " шт (" + r.n + " + 10%), самоклейні, Ø21 мм зовн., отвір 7–11 мм, 0,2–0,4 мм. Отвір не менший за плюсовий виступ.</td></tr>" +
+    "<tr><th>Торцеві листи</th><td>2 шт · <b>" + mm(W0 + 2) + " × " + mm(H0 + 2) + " мм</b>, фіш-папір (ячмінний папір) або електрокартон 0,3–0,5 мм</td></tr>" +
+    "<tr><th>Бокова обгортка</th><td>смуга <b>" + mm(2 * (W0 + H0) + 20) + " × " + mm(L0 + 4) + " мм</b> (з напуском 20 мм) або 4 шматки: 2 × " + mm(W0) + "×" + mm(L0 + 4) + " і 2 × " + mm(H0) + "×" + mm(L0 + 4) + " мм, той самий картон</td></tr>" +
+    "<tr><th>Під BMS</th><td>" + (bmsT > 0 ? "лист картону на " + (bmsOn === "H" ? mm(W0) : mm(H0)) + " × " + mm(L0) + " мм грань (або на 10 мм більший за BMS), BMS закріпити двостороннім скотчем 3M/VHB" : "BMS зовні, лист не потрібен") + "</td></tr>" +
+    (foamT > 0 ? "<tr><th>Піна EVA / спінений поліетилен " + fmt(foamT, 1) + " мм</th><td>2 шт · " + mm(W0 + 2) + " × " + mm(H0 + 2) + " мм на торці (поверх картону)</td></tr>" : "") +
+    "<tr><th>Скотч</th><td>каптоновий або скловолоконний 10–20 мм, ≈" + fmt(Math.ceil((2 * (W + H + L) * 3) / 1000), 0) + " м: дроти, кути, краї картону</td></tr>" +
+    "<tr><th>Термоусадка, шар 1 (вздовж " + mm(d[0]) + " мм)</th><td>ПВХ для АКБ, ширина в плоскому стані " + fl(s1) + ", шматок <b>" + mm(len1) + " мм</b> <span class='ids'>(перетин " + mm(d[1]) + "×" + mm(d[2]) + ", напівпериметр " + mm(s1.hp) + " мм; на торці заходить по " + mm(over1) + " мм)</span></td></tr>" +
+    "<tr><th>Термоусадка, шар 2 (упоперек, " + mm(d[1]) + " мм)</th><td>" + fl(s2) + ", шматок <b>" + mm(len2) + " мм</b> <span class='ids'>(перетин " + mm(d[0]) + "×" + mm(d[2]) + ")</span> " + (heavy ? "<span class='pill warn'>радимо</span> маса ≈" + fmt(r.packMass, 1) + " кг" : "<span class='pill ok'>за бажанням</span>") + "</td></tr>" +
+    "<tr><th>Товщина ПВХ</th><td>" + (heavy ? "0,15–0,2 мм (для важкої збірки)" : "0,1–0,15 мм") + "; прозора — видно стан збірки, кольорова — ховає</td></tr>";
 }
 
 function renderGroups(r) {
@@ -661,7 +743,7 @@ function example(S, P) {
 }
 
 // ---------- Збереження (лише в цьому браузері) ----------
-var FIELDS = ["preset", "cap", "amax", "vnom", "vmax", "vmin", "mass", "S", "P", "iload", "derate", "capTol", "irTol", "niMat", "niStrip", "niSpots", "sizeBy", "cells"];
+var FIELDS = ["preset", "cap", "amax", "vnom", "vmax", "vmin", "mass", "S", "P", "iload", "derate", "capTol", "irTol", "niMat", "niStrip", "niSpots", "sizeBy", "bmsT", "foamT", "cells"];
 function save() {
   try { var o = {}; FIELDS.forEach(function (f) { o[f] = $(f).value; }); localStorage.setItem("akb21700", JSON.stringify(o)); } catch (e) {}
 }
@@ -696,7 +778,7 @@ if (!load()) {
 $("preset").addEventListener("change", function () { applyPreset(this.value); render(); });
 ["niMat", "niStrip", "sizeBy"].forEach(function (f) { $(f).addEventListener("change", render); });
 $("niSpots").addEventListener("input", render);
-["cap", "amax", "vnom", "vmax", "vmin", "mass", "S", "P", "iload", "derate", "capTol", "irTol"].forEach(function (f) { $(f).addEventListener("input", render); });
+["cap", "amax", "vnom", "vmax", "vmin", "mass", "S", "P", "iload", "derate", "capTol", "irTol", "bmsT", "foamT"].forEach(function (f) { $(f).addEventListener("input", render); });
 $("cells").addEventListener("input", function () { clearTimeout(window.__t); window.__t = setTimeout(render, 400); });
 $("btnMatch").addEventListener("click", render);
 $("btnExample").addEventListener("click", function () { $("cells").value = example(Math.round(num("S")) || 13, Math.round(num("P")) || 4); render(); });

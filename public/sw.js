@@ -1,5 +1,5 @@
 // Офлайн-кеш «Збірка АКБ 21700». Версія змінюється автоматично при кожній збірці (tools/build.py).
-const CACHE = "akb21700-e119b29955";
+const CACHE = "akb21700-39bec162c1";
 const FILES = [
   "./",
   "fonts.css",
