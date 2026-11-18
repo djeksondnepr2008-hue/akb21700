@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17212b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="АКБ 21700">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<title>Збірка АКБ 21700</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root {
+  /* Майстерня: сталево-сірий папір, нікелева синь як акцент, бурштин каптону для попереджень.
+     Розкладка: зведення зверху, далі робочі панелі в дві колонки, на телефоні — одна. */
+  --bg: #eef1f3;
+  --panel: #ffffff;
+  --ink: #17212b;
+  --muted: #5b6875;
+  --line: #d5dce2;
+  --accent: #1f6fb2;
+  --accent-soft: #e3eef8;
+  --ok: #1f8a4c;
+  --warn: #b7791f;
+  --bad: #c0392b;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11171d; --panel: #18212a; --ink: #e6edf3; --muted: #93a2b1; --line: #2a3643;
+    --accent: #5aa7e8; --accent-soft: #1b2d3e; --ok: #45c07a; --warn: #e2a84a; --bad: #ef6b5b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11171d; --panel: #18212a; --ink: #e6edf3; --muted: #93a2b1; --line: #2a3643;
+  --accent: #5aa7e8; --accent-soft: #1b2d3e; --ok: #45c07a; --warn: #e2a84a; --bad: #ef6b5b;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-body); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 48px; display: grid; gap: 16px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+h1 { font: 800 clamp(24px, 4vw, 34px)/1.1 var(--font-display); margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+h1 small { font: 600 13px var(--font-mono); color: var(--accent); margin-left: 8px; letter-spacing: .04em; }
+.lede { margin: 0; color: var(--muted); max-width: 65ch; }
+h2 { font: 700 17px/1.2 var(--font-display); margin: 0 0 12px; letter-spacing: .01em; text-wrap: balance; display: flex; align-items: center; gap: 8px; }
+h2 .n { font: 600 12px var(--font-mono); color: var(--panel); background: var(--accent); border-radius: 4px; padding: 1px 6px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 860px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px 12px; }
+label { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); }
+input, select, textarea, button { font: inherit; color: var(--ink); }
+input, select, textarea { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; }
+input[type=number] { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+textarea { font: 13px/1.45 var(--font-mono); min-height: 190px; resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button { cursor: pointer; border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 7px 12px; font-size: 13.5px; }
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+button.chip { padding: 4px 9px; font: 600 12px var(--font-mono); border-radius: 999px; }
+button.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.hint { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.tile b { display: block; font: 600 22px/1.15 var(--font-mono); font-variant-numeric: tabular-nums; }
+.tile span { font-size: 12px; color: var(--muted); }
+.tile.key { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.config { font: 600 13px var(--font-mono); color: var(--accent); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; }
+td.num, th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.scroll { overflow-x: auto; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font: 600 11.5px var(--font-mono); border: 1px solid currentColor; }
+.pill.ok { color: var(--ok); } .pill.warn { color: var(--warn); } .pill.bad { color: var(--bad); }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.ids { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.list { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.list li::marker { color: var(--accent); }
+.views { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.view { margin: 0; min-width: 0; }
+.view figcaption { font: 600 13px var(--font-body); margin: 0 0 6px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 10px; font-size: 12.5px; color: var(--muted); align-items: center; }
+.legend i { display: inline-block; vertical-align: -2px; margin-right: 6px; }
+h3.sub { font: 700 14px/1.2 var(--font-display); margin: 0 0 8px; }
+.note { border-left: 3px solid var(--warn); background: color-mix(in srgb, var(--warn) 9%, transparent); padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 13px; }
+.layout-box { overflow-x: auto; border: 1px dashed var(--line); border-radius: 8px; padding: 8px; background: var(--bg); }
+.layout-box svg { display: block; }
+.status { font: 600 12px var(--font-mono); }
+.copied { color: var(--ok); font-size: 12.5px; }
+@media (prefers-reduced-motion: no-preference) { button { transition: border-color .15s, background .15s; } }
+
+/* ---------- iPhone / PWA ---------- */
+.wrap { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right));
+        padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(48px, calc(env(safe-area-inset-bottom) + 24px)); }
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+@media (pointer: coarse) {
+  input, select, textarea { font-size: 16px; } /* iOS не збільшує сторінку при фокусі */
+  textarea { min-height: 220px; }
+  button { min-height: 40px; }
+  button.chip { min-height: 34px; padding: 6px 11px; }
+}
+.install-hint { position: fixed; z-index: 50; left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right));
+  bottom: calc(env(safe-area-inset-bottom) + 12px); display: flex; gap: 10px; align-items: center;
+  background: var(--panel); border: 1px solid var(--accent); border-radius: 12px; padding: 10px 10px 10px 14px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.18); font-size: 14px; }
+.install-hint p { margin: 0; flex: 1; }
+.install-hint svg { vertical-align: -3px; color: var(--accent); }
+.install-hint button { flex: 0 0 auto; }
+.offline-note { font: 600 12px var(--font-mono); color: var(--ok); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Збірка АКБ <small>21700 · S/P · підбір груп</small></h1>
+      <p class="lede">Розрахунок конфігурації, підбір рівних паралельних груп з виміряних комірок і схема розкладки. Відкривається з прикладом на 13S4P: замініть дані своїми.</p>
+    </div>
+  </header>
+
+  <section class="tiles" id="tiles" aria-label="Зведення"></section>
+
+  <div class="grid2">
+    <section class="panel" aria-labelledby="h-cell">
+      <h2 id="h-cell"><span class="n">1</span>Комірка</h2>
+      <div class="fields">
+        <label style="grid-column: 1 / -1">Модель
+          <select id="preset"></select>
+        </label>
+        <label>Ємність, мА·год<input id="cap" type="number" min="500" step="50"></label>
+        <label>Макс. струм, А<input id="amax" type="number" min="1" step="0.5"></label>
+        <label>Номінал, В<input id="vnom" type="number" step="0.01"></label>
+        <label>Повний заряд, В<input id="vmax" type="number" step="0.01"></label>
+        <label>Відсічка, В<input id="vmin" type="number" step="0.05"></label>
+        <label>Вага, г<input id="mass" type="number" step="0.5"></label>
+      </div>
+      <p class="hint" id="presetNote"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="h-conf">
+      <h2 id="h-conf"><span class="n">2</span>Конфігурація</h2>
+      <div class="fields">
+        <label>Послідовно, S<input id="S" type="number" min="1" max="30" step="1"></label>
+        <label>Паралельно, P<input id="P" type="number" min="1" max="30" step="1"></label>
+        <label>Робочий струм, А<input id="iload" type="number" min="0" step="1"></label>
+        <label>Запас струму, %<input id="derate" type="number" min="30" max="100" step="5"></label>
+      </div>
+      <div class="row" style="margin-top:10px" id="sPresets" aria-label="Типові напруги"></div>
+      <p class="hint" id="confHint"></p>
+    </section>
+  </div>
+
+  <div class="grid2">
+    <section class="panel" aria-labelledby="h-cells">
+      <h2 id="h-cells"><span class="n">3</span>Виміряні комірки</h2>
+      <label for="cells">Одна комірка на рядок: ємність мА·год, опір мОм, напруга В (опір і напруга необов'язкові). Номер можна поставити першим: <span class="ids">#12 4985 14.2 3.62</span></label>
+      <textarea id="cells" spellcheck="false"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button type="button" class="primary" id="btnMatch">Підібрати групи</button>
+        <button type="button" id="btnExample">Приклад даних</button>
+        <button type="button" id="btnClear">Очистити</button>
+        <span class="status" id="cellStatus"></span>
+      </div>
+      <div class="fields" style="margin-top:12px">
+        <label>Відкинути, якщо ємність нижча за медіану на, %<input id="capTol" type="number" min="1" max="50" step="1" value="8"></label>
+        <label>Відкинути, якщо опір вищий за медіану на, %<input id="irTol" type="number" min="5" max="200" step="5" value="35"></label>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-hw">
+      <h2 id="h-hw"><span class="n">4</span>Обв'язка</h2>
+      <div class="fields" style="margin-bottom:10px">
+        <label style="grid-column: 1 / -1">Дроти, запобіжник і BMS рахувати від
+          <select id="sizeBy">
+            <option value="load">робочого струму (поле «Робочий струм» у розділі 2)</option>
+            <option value="max">максимального струму збірки (залежить від P і комірки)</option>
+          </select>
+        </label>
+      </div>
+      <div class="scroll"><table id="hwTable"></table></div>
+      <p class="hint">Перетин дроту залежить від струму, а не від S: при тому самому струмі 4S і 14S потребують однакового дроту. Дріт підбирається так, щоб витримати струм спрацювання запобіжника. Значення орієнтовні для силіконового дроту довжиною до 1 м; під навантаженням перевіряйте нагрів з'єднань.</p>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="h-groups">
+    <h2 id="h-groups"><span class="n">5</span>Паралельні групи</h2>
+    <div class="row" style="margin-bottom:10px">
+      <span id="balanceSummary"></span>
+      <button type="button" id="btnCopy">Копіювати таблицю (CSV)</button>
+      <span class="copied" id="copied" aria-live="polite"></span>
+    </div>
+    <div class="scroll"><table id="groupTable"></table></div>
+    <p class="hint" id="spares"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-ni">
+    <h2 id="h-ni"><span class="n">6</span>Нікелева стрічка</h2>
+    <div class="fields">
+      <label>Матеріал<select id="niMat"></select></label>
+      <label>Стрічка<select id="niStrip"></select></label>
+      <label>Точок на контакт<input id="niSpots" type="number" min="2" max="6" step="1" value="4"></label>
+    </div>
+    <div class="scroll" style="margin-top:12px"><table id="niTable"></table></div>
+    <div class="note" style="margin-top:12px" id="niNote"></div>
+    <div class="grid2" style="margin-top:14px">
+      <div>
+        <h3 class="sub">Як укладати</h3>
+        <ol class="list">
+          <li><b>Паралельна стрічка</b> йде вздовж групи (колонки) і з'єднує однакові полюси всіх P комірок. Вона вирівнює групу і несе невеликий струм.</li>
+          <li><b>Послідовні перемички</b> з'єднують <i>кожну</i> комірку групи з сусідньою коміркою наступної групи, тобто P перемичок на стик. Тоді кожна несе лише I/P. Одна перемичка в кінці групи прийме весь струм і перегріється.</li>
+          <li>Стики між групами чергуються: 1→2 на верхньому торці, 2→3 на нижньому і так далі (змійка). Тому з кожного боку стрічки «зебра» через одну колонку.</li>
+          <li>Зручно варити «драбиною»: суцільна стрічка вздовж колонки плюс поперечні перемички по рядах. Або широкою стрічкою 2P (27 мм), яка одним шматком накриває дві сусідні комірки різних груп.</li>
+          <li>Між торцем і стрічкою на плюсовому боці — ізоляційне кільце: край корпусу комірки поруч із плюсом — це мінус.</li>
+        </ol>
+      </div>
+      <div>
+        <h3 class="sub">Як варити</h3>
+        <ol class="list">
+          <li>Перевірте стрічку: шматок із подряпиною в солоній воді на добу. Іржа означає сталь. Під час різання диском сталь іскрить, нікель — ні.</li>
+          <li>Тільки контактне зварювання. Спершу пробні точки на мертвій комірці або обрізку, потім спроба відірвати: має рватися стрічка, а не точка.</li>
+          <li>На кожен контакт 2 пари точок (4 точки), електроди притискайте однаково, імпульс короткий. Не варіть кілька разів в одне місце.</li>
+          <li>На плюсі варіть по плоскій кришці, подалі від краю корпусу. На мінусі — по центру дна.</li>
+          <li>Кілька шарів кладіть по одному: шар приварили, перевірили, потім наступний. Через товстий пакет зварювач не проварить.</li>
+          <li>Балансувальні дроти паяйте до стрічки, не до комірки, швидко і подалі від торця.</li>
+          <li>Інструмент з ізоляцією, окуляри, на столі нічого металевого. Коротке замикання групи зварює пінцет за мить.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-layout">
+    <h2 id="h-layout"><span class="n">7</span>Схема розкладки й стрічки</h2>
+    <p class="hint" style="margin:0 0 10px">Два торці збірки в масштабі (комірка 21,6 мм, стрічка обраної ширини). Колонка — паралельна група Г1…Г<span id="bmax">13</span>, сусідні групи перевернуті. Нижній торець намальовано так, як ви його побачите, перевернувши збірку через лівий-правий край: групи йдуть у зворотному порядку. Цифра в комірці — її номер зі списку.</p>
+    <div class="views">
+      <figure class="view"><figcaption>Верхній торець (сторона А)</figcaption><div class="layout-box" id="layoutA"></div></figure>
+      <figure class="view"><figcaption>Нижній торець (сторона Б, перевернуто)</figcaption><div class="layout-box" id="layoutB"></div></figure>
+    </div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-safe">
+    <h2 id="h-safe"><span class="n">8</span>Перед зварюванням</h2>
+    <ul class="list">
+      <li>Зарядіть або розрядіть усі комірки до однієї напруги: різниця в групі не більше 0,05 В. Інакше в момент з'єднання між ними піде великий струм вирівнювання.</li>
+      <li>Зварюйте контактним зварюванням. Паяльник перегріває комірку і пошкоджує її.</li>
+      <li>Ставте ізолятори на плюсові торці (кільця з фіш-паперу), а між групами — прокладки з ізоляційного картону.</li>
+      <li>BMS обов'язкова: вона балансує групи й вимикає збірку при перезаряді, глибокому розряді та перевищенні струму.</li>
+      <li>Запобіжник на силовому дроті ставте якомога ближче до АКБ.</li>
+      <li>Не беріть комірки з пошкодженою плівкою, вм'ятинами чи напругою нижче 2,5 В.</li>
+      <li>Першу зарядку проводьте під наглядом, на негорючій поверхні.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+"use strict";
+// ---------- Дані комірок (за даташитами виробників; перевіряйте свою партію) ----------
+var PRESETS = [
+  { id: "50E",   name: "Samsung INR21700-50E", cap: 5000, amax: 9.8,  vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 69, note: "Ємнісна: 9,8 А тривало, 14,7 А короткочасно (за температури до 70 °C)." },
+  { id: "50S",   name: "Samsung INR21700-50S", cap: 5000, amax: 25,   vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 70, note: "Ємність і струм: 25 А без температурного обмеження (45 А до 80 °C)." },
+  { id: "M50LT", name: "LG INR21700-M50LT",    cap: 4800, amax: 7.2,  vnom: 3.69, vmax: 4.2, vmin: 2.5, mass: 68, note: "Ємнісна: розряд 0,5–3C залежно від температури; тривало ≈1,5C." },
+  { id: "40T",   name: "Samsung INR21700-40T", cap: 4000, amax: 35,   vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 67, note: "Струмова: 35 А." },
+  { id: "P42A",  name: "Molicel INR-21700-P42A", cap: 4200, amax: 45, vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 70, note: "Струмова: 45 А за даташитом, але це не справжній тривалий режим; ресурс на великих струмах падає." },
+  { id: "P45B",  name: "Molicel INR-21700-P45B", cap: 4500, amax: 45, vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 70, note: "Струмова: 45 А до відсічки 80 °C; повністю розрядити на такому струмі не можна." },
+  { id: "custom", name: "Інша (ввести вручну)", cap: 4500, amax: 15, vnom: 3.6,  vmax: 4.2, vmin: 2.5, mass: 70, note: "Введіть дані з даташита своєї комірки." }
+];
+var S_PRESETS = [[3, "11,1 В"], [4, "14,8 В"], [6, "22,2 В"], [7, "25,9 В"], [10, "36 В"], [13, "48 В"], [14, "52 В"], [16, "60 В"], [20, "72 В"]];
+// Стрічки: товщина × ширина, мм. Допустимий струм = перетин × щільність струму.
+// Для чистого нікелю орієнтир 5–8 А/мм² тривало; беремо обережні 5 А/мм².
+var STRIPS = [
+  { id: "0.15x8",  t: 0.15, w: 8,  label: "0,15 × 8 мм" },
+  { id: "0.2x8",   t: 0.2,  w: 8,  label: "0,2 × 8 мм" },
+  { id: "0.15x10", t: 0.15, w: 10, label: "0,15 × 10 мм" },
+  { id: "0.2x10",  t: 0.2,  w: 10, label: "0,2 × 10 мм" },
+  { id: "0.3x8",   t: 0.3,  w: 8,  label: "0,3 × 8 мм" },
+  { id: "0.15x27", t: 0.15, w: 27, label: "0,15 × 27 мм (2P, широка)" }
+];
+var MATERIALS = [
+  { id: "ni",    k: 5,   label: "Чистий нікель (Ni200 / N6)" },
+  { id: "steel", k: 3,   label: "Нікельована сталь (не радимо)" },
+  { id: "cuni",  k: 12,  label: "Мідь + нікель (сендвіч)" }
+];
+// Орієнтовно для силіконового дроту до 1 м: [допустимий струм, А, перетин]
+var AWG = [[10, "18 AWG (0,8 мм²)"], [20, "16 AWG (1,3 мм²)"], [30, "14 AWG (2,1 мм²)"], [45, "12 AWG (3,3 мм²)"], [65, "10 AWG (5,3 мм²)"],
+  [90, "8 AWG (8,4 мм²)"], [130, "6 AWG (13 мм²)"], [180, "4 AWG (21 мм²)"], [250, "2 AWG (34 мм²)"], [350, "1/0 AWG (53 мм²)"], [420, "2/0 AWG (67 мм²)"], [550, "4/0 AWG (107 мм²)"]];
+var COLORS = ["#1f6fb2", "#d0612a", "#2f9e5b", "#8e44ad", "#c0392b", "#16a2a2", "#b7791f", "#5d6d7e", "#d4448f", "#3f51b5", "#7cb342", "#795548"];
+
+var $ = function (id) { return document.getElementById(id); };
+var state = { cells: [], groups: [], spares: [], rejected: [] };
+
+// ---------- Розбір введених комірок ----------
+function parseCells(text) {
+  var out = [], auto = 1;
+  text.split(/\r?\n/).forEach(function (line) {
+    var raw = line.replace(/\/\/.*$/, "").trim();
+    if (!raw) return;
+    var id = null;
+    var m = /^#?\s*([A-Za-zА-Яа-яІіЇїЄє]*\d+)\s*[:;,\s]\s*(.*)$/.exec(raw);
+    var rest = raw;
+    if ((/^#/.test(raw) || /^[A-Za-zА-Яа-яІіЇїЄє]+\d+[:;,\s]/.test(raw)) && m) { id = m[1]; rest = m[2]; }
+    // Токени: пробіл/;/таб розділяють; «14,2» — десяткова кома; «4985,14.2,3.6» — CSV через кому
+    var nums = [];
+    rest.split(/[\s;\t]+/).forEach(function (tok) {
+      if (!tok) return;
+      var parts = (/^\d+,\d+$/.test(tok) && tok.indexOf(".") < 0 && tok.split(",")[1].length <= 2) ? [tok.replace(",", ".")] : tok.split(",");
+      parts.forEach(function (p) { var mm = /-?\d+(?:\.\d+)?/.exec(p); if (mm) nums.push(Number(mm[0])); });
+    });
+    if (!nums.length) return;
+    var cap = nums[0], ir = null, v = null;
+    nums.slice(1).forEach(function (n) {
+      if (n > 2 && n < 4.4 && v === null && String(n).indexOf(".") >= 0) v = n;
+      else if (ir === null) ir = n;
+      else if (v === null) v = n;
+    });
+    if (!(cap >= 300 && cap <= 8000)) return;
+    out.push({ id: id || String(auto), cap: cap, ir: ir, v: v });
+    auto++;
+  });
+  return out;
+}
+
+function median(a) {
+  if (!a.length) return 0;
+  var s = a.slice().sort(function (x, y) { return x - y; }), m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
+// ---------- Підбір груп: змійка + обміни для вирівнювання ----------
+function rng(seed) { return function () { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }; }
+
+function matchGroups(cells, S, P) {
+  var need = S * P;
+  var sorted = cells.slice().sort(function (a, b) { return b.cap - a.cap; });
+  var use = sorted.slice(0, need), spares = sorted.slice(need);
+  var groups = []; for (var g = 0; g < S; g++) groups.push([]);
+  use.forEach(function (c, i) {
+    var round = Math.floor(i / S), pos = i % S;
+    groups[round % 2 === 0 ? pos : S - 1 - pos].push(c);
+  });
+  var hasIR = use.every(function (c) { return c.ir > 0; });
+  var meanIR = hasIR ? use.reduce(function (s, c) { return s + c.ir; }, 0) / use.length : 0;
+  function sum(gr) { return gr.reduce(function (s, c) { return s + c.cap; }, 0); }
+  function pir(gr) { return 1 / gr.reduce(function (s, c) { return s + 1 / c.ir; }, 0); }
+  function cost() {
+    var sums = groups.map(sum), cr = Math.max.apply(null, sums) - Math.min.apply(null, sums);
+    if (!hasIR) return cr;
+    var irs = groups.map(pir), ir = (Math.max.apply(null, irs) - Math.min.apply(null, irs)) / (meanIR / P);
+    return cr + ir * 40; // 1% розкиду опору групи ≈ 0,4 мА·год розкиду ємності
+  }
+  if (S > 1 && P > 0) {
+    var rand = rng(12345), best = cost(), iter = 4000 + need * 60;
+    for (var k = 0; k < iter; k++) {
+      var a = Math.floor(rand() * S), b = Math.floor(rand() * S); if (a === b) continue;
+      var i = Math.floor(rand() * P), j = Math.floor(rand() * P);
+      var t = groups[a][i]; groups[a][i] = groups[b][j]; groups[b][j] = t;
+      var c = cost();
+      if (c <= best) best = c; else { t = groups[a][i]; groups[a][i] = groups[b][j]; groups[b][j] = t; }
+    }
+  }
+  return { groups: groups, spares: spares, hasIR: hasIR };
+}
+
+// ---------- Розрахунок ----------
+function num(id) { var v = parseFloat($(id).value); return isFinite(v) ? v : 0; }
+function fmt(n, d) { return n.toLocaleString("uk-UA", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+
+function calc() {
+  var S = Math.max(1, Math.round(num("S"))), P = Math.max(1, Math.round(num("P")));
+  var cap = num("cap") / 1000, amax = num("amax"), vnom = num("vnom"), vmax = num("vmax"), vmin = num("vmin"), mass = num("mass");
+  var der = Math.min(100, Math.max(30, num("derate"))) / 100, iload = num("iload");
+  var n = S * P, ah = cap * P, wh = ah * vnom * S, iMax = amax * P, iRec = iMax * der;
+  var r = { S: S, P: P, n: n, vnom: vnom * S, vmax: vmax * S, vmin: vmin * S, ah: ah, wh: wh, iMax: iMax, iRec: iRec,
+    mass: n * mass / 1000, packMass: n * mass / 1000 * 1.15, w: S * 21.6, h: P * 21.6, l: 70.5, iload: iload,
+    pRec: iRec * vnom * S, pMinNeeded: amax > 0 ? Math.ceil(iload / (amax * der)) : 0 };
+  return r;
+}
+
+function tile(v, label, key) { return '<div class="tile' + (key ? " key" : "") + '"><b>' + v + "</b><span>" + label + "</span></div>"; }
+
+function render() {
+  var r = calc();
+  $("tiles").innerHTML =
+    tile(r.S + "S" + r.P + "P", r.n + " комірок", true) +
+    tile(fmt(r.vnom, 1) + " В", "номінал · " + fmt(r.vmax, 1) + " В повна · " + fmt(r.vmin, 1) + " В відсічка") +
+    tile(fmt(r.ah, 1) + " А·год", fmt(r.wh, 0) + " Вт·год") +
+    tile(fmt(r.iRec, 0) + " А", "рекомендовано тривало · макс. " + fmt(r.iMax, 0) + " А") +
+    tile(fmt(r.pRec / 1000, 2) + " кВт", "потужність при рекомендованому струмі") +
+    tile("≈" + fmt(r.packMass, 1) + " кг", "збірка · комірки " + fmt(r.mass, 2) + " кг") +
+    tile(fmt(r.w, 0) + "×" + fmt(r.h, 0) + "×" + fmt(r.l, 0), "мм, цеглина S×P без корпусу");
+
+  var hint = [];
+  if (r.iload > 0) {
+    if (r.iload > r.iRec) hint.push('<span class="pill bad">мало P</span> Для ' + fmt(r.iload, 0) + " А потрібно щонайменше " + r.pMinNeeded + "P цих комірок або струмовіша модель.");
+    else hint.push('<span class="pill ok">струм ок</span> ' + fmt(r.iload, 0) + " А — це " + fmt(r.iload / r.P, 1) + " А на комірку.");
+  }
+  $("confHint").innerHTML = hint.join(" ");
+  $("bmax").textContent = r.S;
+  document.querySelectorAll("#sPresets button").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.s === r.S)); });
+
+  // Обв'язка
+  var byMax = $("sizeBy").value === "max" || !(r.iload > 0);
+  var iDesign = byMax ? r.iMax : r.iload;
+  var basis = byMax ? "макс. струм збірки " + r.P + "P × " + fmt(num("amax"), 1) + " А" : "робочий струм";
+  var bms = Math.ceil(iDesign * 1.25 / 5) * 5;
+  var fuse = Math.ceil(iDesign * 1.25 / 5) * 5;
+  // Дріт має витримати струм, при якому спрацює запобіжник, тому підбираємо за номіналом запобіжника
+  var awgRow = AWG.find(function (a) { return a[0] >= fuse; });
+  var awg = awgRow ? awgRow[1] : "<span class='pill bad'>понад " + AWG[AWG.length - 1][0] + " А</span> мідна шина або кілька дротів паралельно";
+  var chgA = Math.max(0.5, Math.round(num("cap") / 1000 * 0.3 * r.P * 2) / 2);
+  $("hwTable").innerHTML =
+    "<tr><th>Струм, на який рахуємо</th><td class='num'>" + fmt(iDesign, 0) + " А <span class='ids'>(" + basis + ")</span></td></tr>" +
+    "<tr><th>BMS</th><td>" + r.S + "S, тривалий струм ≥ " + bms + " А, з балансуванням</td></tr>" +
+    "<tr><th>Зарядний пристрій</th><td>" + fmt(r.vmax, 1) + " В (CC/CV), " + fmt(chgA, 1) + " А (≈0,3C)</td></tr>" +
+    "<tr><th>Запобіжник</th><td>" + fuse + " А, на плюсовому дроті біля АКБ</td></tr>" +
+    "<tr><th>Силові дроти</th><td>" + awg + " <span class='ids'>— під запобіжник " + fuse + " А</span></td></tr>" +
+    "<tr><th>Нікель</th><td>див. розділ «Нікелева стрічка» нижче</td></tr>" +
+    "<tr><th>Балансувальні дроти</th><td>" + (r.S + 1) + " шт. (B0…B" + r.S + "), 22–24 AWG</td></tr>";
+  renderNickel(r, iDesign);
+  renderGroups(r);
+  save();
+}
+
+function renderNickel(r, iDesign) {
+  var mat = MATERIALS.find(function (m) { return m.id === $("niMat").value; }) || MATERIALS[0];
+  var st = STRIPS.find(function (x) { return x.id === $("niStrip").value; }) || STRIPS[0];
+  var area = st.t * st.w, amp = area * mat.k;
+  var perBridge = iDesign / r.P;                    // струм через одну послідовну перемичку
+  var layers = Math.max(1, Math.ceil(perBridge / amp));
+  r.layers = layers;
+  var endLayers = Math.max(1, Math.ceil(iDesign / amp)); // якби зробили одну перемичку на стик
+  var pitch = 21.6;
+  var parLen = r.S * 2 * (r.P * pitch + 10);         // паралельні стрічки, обидва торці, з запасом
+  var bridgeLen = (r.S - 1) * r.P * (pitch * 2 + 4) * layers;
+  var termLen = 2 * (r.P * pitch + 20);              // виводи B− і B+
+  var spots = r.n * 2 * Math.max(2, Math.round(num("niSpots"))) + (r.S - 1) * r.P * 2 * 2 * Math.max(0, layers - 1);
+  var drop = perBridge * (6.84e-8 * (mat.id === "steel" ? 2.5 : mat.id === "cuni" ? 0.35 : 1) * (pitch / 1000) / (area * layers / 1e6)) * 1000;
+  $("niTable").innerHTML =
+    "<tr><th>Струм збірки</th><td class='num'>" + fmt(iDesign, 0) + " А</td></tr>" +
+    "<tr><th>Струм через одну перемичку (I/" + r.P + ")</th><td class='num'>" + fmt(perBridge, 1) + " А</td></tr>" +
+    "<tr><th>Допустимо для " + st.label + ", 1 шар</th><td class='num'>≈" + fmt(amp, 1) + " А</td></tr>" +
+    "<tr><th>Шарів на кожну перемичку</th><td class='num'><b>" + layers + "</b>" + (layers > 2 ? " <span class='pill warn'>краще ширша стрічка або мідь</span>" : " <span class='pill ok'>ок</span>") + "</td></tr>" +
+    "<tr><th>Перемичок на стик / усього</th><td class='num'>" + r.P + " / " + (r.S - 1) * r.P + "</td></tr>" +
+    "<tr><th>Шарів у виводах B− і B+</th><td class='num'>" + endLayers + "</td></tr>" +
+    "<tr><th>Падіння на перемичці</th><td class='num'>≈" + fmt(drop, 1) + " мВ</td></tr>" +
+    "<tr><th>Стрічки потрібно (з запасом 15%)</th><td class='num'>≈" + fmt((parLen + bridgeLen + termLen * endLayers) * 1.15 / 1000, 1) + " м</td></tr>" +
+    "<tr><th>Точок зварювання</th><td class='num'>≈" + fmt(spots, 0) + "</td></tr>";
+  $("niNote").innerHTML = "Виводи B− і B+ (крайні групи до BMS і роз'єму) несуть увесь струм збірки, тому там потрібно " + endLayers +
+    " шар(и) або перехід на мідну шину чи дріт. Якби на кожному стику була лише одна перемичка, вона мала б нести " + fmt(iDesign, 0) +
+    " А і вимагала б " + endLayers + " шарів, тому перемички ставимо по всіх " + r.P + " рядах." +
+    (mat.id === "steel" ? " <b>Нікельована сталь</b> має в кілька разів вищий опір і гріється; для силових збірок не годиться." : "");
+}
+
+function renderGroups(r) {
+  var cells = parseCells($("cells").value);
+  var capMed = median(cells.map(function (c) { return c.cap; }));
+  var irs = cells.filter(function (c) { return c.ir > 0; }).map(function (c) { return c.ir; });
+  var irMed = median(irs), capTol = num("capTol") / 100, irTol = num("irTol") / 100;
+  var good = [], rejected = [];
+  cells.forEach(function (c) {
+    var why = [];
+    if (c.cap < capMed * (1 - capTol)) why.push("ємність");
+    if (c.ir > 0 && irMed && c.ir > irMed * (1 + irTol)) why.push("опір");
+    if (c.v !== null && c.v < 2.5) why.push("напруга < 2,5 В");
+    (why.length ? rejected : good).push(why.length ? Object.assign({ why: why.join(", ") }, c) : c);
+  });
+  var need = r.n;
+  var st = $("cellStatus");
+  st.innerHTML = cells.length + " комірок · придатних " + good.length + " · потрібно " + need +
+    (good.length < need ? ' <span class="pill bad">не вистачає ' + (need - good.length) + "</span>" : ' <span class="pill ok">вистачає</span>');
+
+  if (good.length < need || !cells.length) {
+    $("groupTable").innerHTML = "<tr><td>Додайте щонайменше " + need + " придатних комірок, щоб скласти " + r.S + "S" + r.P + "P.</td></tr>";
+    $("balanceSummary").innerHTML = "";
+    $("spares").textContent = rejected.length ? "Відкинуто: " + rejected.map(function (c) { return "#" + c.id + " (" + c.why + ")"; }).join(", ") : "";
+    state.groups = []; drawLayout(r, []); return;
+  }
+  var res = matchGroups(good, r.S, r.P);
+  state.groups = res.groups; state.spares = res.spares; state.rejected = rejected;
+  var sums = res.groups.map(function (g) { return g.reduce(function (s, c) { return s + c.cap; }, 0); });
+  var mean = sums.reduce(function (a, b) { return a + b; }, 0) / sums.length;
+  var spread = (Math.max.apply(null, sums) - Math.min.apply(null, sums)) / mean * 100;
+  var cls = spread <= 0.5 ? "ok" : spread <= 1.5 ? "warn" : "bad";
+  $("balanceSummary").innerHTML = '<span class="pill ' + cls + '">розкид груп ' + fmt(spread, 2) + "%</span> " +
+    "найслабша група " + fmt(Math.min.apply(null, sums), 0) + " мА·год — вона й визначає ємність збірки";
+
+  var rows = "<thead><tr><th>Група</th><th>Комірки</th><th class='num'>Сума, мА·год</th><th class='num'>Відхил.</th>" +
+    (res.hasIR ? "<th class='num'>Опір групи, мОм</th>" : "") + "<th class='num'>ΔU, В</th></tr></thead><tbody>";
+  res.groups.forEach(function (g, i) {
+    var dev = (sums[i] - mean) / mean * 100;
+    var vs = g.filter(function (c) { return c.v !== null; }).map(function (c) { return c.v; });
+    var dv = vs.length > 1 ? Math.max.apply(null, vs) - Math.min.apply(null, vs) : null;
+    var pir = res.hasIR ? 1 / g.reduce(function (s, c) { return s + 1 / c.ir; }, 0) : 0;
+    rows += "<tr><td><span class='swatch' style='background:" + COLORS[i % COLORS.length] + "'></span>" + (i + 1) + "</td>" +
+      "<td class='ids'>" + g.map(function (c) { return "#" + c.id + " " + c.cap + (c.ir ? "/" + c.ir : ""); }).join(", ") + "</td>" +
+      "<td class='num'>" + fmt(sums[i], 0) + "</td><td class='num'>" + (dev >= 0 ? "+" : "") + fmt(dev, 2) + "%</td>" +
+      (res.hasIR ? "<td class='num'>" + fmt(pir, 2) + "</td>" : "") +
+      "<td class='num'>" + (dv === null ? "—" : (dv > 0.05 ? "<span class='pill bad'>" : "") + fmt(dv, 2) + (dv > 0.05 ? "</span>" : "")) + "</td></tr>";
+  });
+  $("groupTable").innerHTML = rows + "</tbody>";
+  var sp = [];
+  if (res.spares.length) sp.push("Запасні (не увійшли): " + res.spares.map(function (c) { return "#" + c.id; }).join(", ") + ".");
+  if (rejected.length) sp.push("Відкинуто: " + rejected.map(function (c) { return "#" + c.id + " (" + c.why + ")"; }).join(", ") + ".");
+  $("spares").textContent = sp.join(" ");
+  drawLayout(r, res.groups);
+}
+
+// ---------- Схема ----------
+function drawLayout(r, groups) {
+  var stripSel = STRIPS.find(function (x) { return x.id === $("niStrip").value; }) || STRIPS[0];
+  var layers = r.layers || 1;
+  $("layoutA").innerHTML = drawFace(r, groups, "A", stripSel, layers);
+  $("layoutB").innerHTML = drawFace(r, groups, "B", stripSel, layers);
+  $("legend").innerHTML =
+    '<span><i style="width:22px;height:9px;background:linear-gradient(#d9dee2,#9aa4ab);border:1px solid #7d878e;border-radius:2px"></i>нікелева стрічка</span>' +
+    '<span><i style="width:10px;height:10px;border-radius:50%;background:#2b2f33;box-shadow:6px 0 0 #2b2f33"></i>точки зварювання (2 пари на контакт)</span>' +
+    '<span><i style="width:14px;height:14px;border-radius:50%;border:3px solid #c8742c"></i>ізоляційне кільце на плюсі</span>' +
+    '<span><i style="width:12px;height:12px;border-radius:50%;background:#f4c430;border:1px solid #9a7a10"></i>точка балансувального дроту</span>' +
+    '<span><i style="width:22px;height:4px;background:#d32f2f"></i>B+ / <i style="width:22px;height:4px;background:#222;margin-left:4px"></i>B− силові виводи</span>' +
+    (layers > 1 ? '<span><b>×' + layers + '</b> — шарів стрічки на перемичці</span>' : "");
+}
+
+function drawFace(r, groups, face, strip, layers) {
+  var S = r.S, P = r.P, mm = 2.5, d = 21.6 * mm, R = d / 2 - 0.8;
+  var sw = Math.min(d * 0.9, strip.w * mm);              // ширина стрічки в масштабі
+  var padX = 92, top = 52, bottom = 34;
+  var W = padX * 2 + S * d, H = top + P * d + bottom;
+  var mirror = face === "B";
+  function col(g) { return mirror ? S - 1 - g : g; }
+  function cx(g) { return padX + col(g) * d + d / 2; }
+  function cy(p) { return top + p * d + d / 2; }
+  function plusOnFace(g) { return (g % 2 === 0) === (face === "A"); } // група 0: плюс на стороні А
+  function bridged(g) { return face === "A" ? g % 2 === 0 : g % 2 === 1; } // стик g→g+1 на цій стороні
+  var css = getComputedStyle(document.documentElement);
+  var ink = css.getPropertyValue("--ink").trim(), muted = css.getPropertyValue("--muted").trim(), line = css.getPropertyValue("--line").trim();
+  var id = "f" + face;
+  var o = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Торець ' + face + '">';
+  o += "<defs>" +
+    '<linearGradient id="' + id + 'ni" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4e8eb"/><stop offset=".5" stop-color="#b9c1c7"/><stop offset="1" stop-color="#959fa6"/></linearGradient>' +
+    '<linearGradient id="' + id + 'niv" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e4e8eb"/><stop offset=".5" stop-color="#b9c1c7"/><stop offset="1" stop-color="#959fa6"/></linearGradient>' +
+    '<radialGradient id="' + id + 'cap" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#f3f5f6"/><stop offset="1" stop-color="#a9b1b7"/></radialGradient>' +
+    '<radialGradient id="' + id + 'can" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#cfd5d9"/><stop offset="1" stop-color="#7f898f"/></radialGradient>' +
+    "</defs>";
+  // корпус-рамка збірки
+  o += '<rect x="' + (padX - 6) + '" y="' + (top - 6) + '" width="' + (S * d + 12) + '" height="' + (P * d + 12) + '" rx="8" fill="none" stroke="' + line + '" stroke-dasharray="3 3"/>';
+
+  // 1) комірки
+  for (var g = 0; g < S; g++) {
+    var wrap = COLORS[g % COLORS.length], plus = plusOnFace(g);
+    for (var p = 0; p < P; p++) {
+      var x = cx(g), y = cy(p);
+      o += '<circle cx="' + x + '" cy="' + y + '" r="' + R + '" fill="' + wrap + '"/>';               // плівка
+      if (plus) {
+        o += '<circle cx="' + x + '" cy="' + y + '" r="' + (R * 0.86) + '" fill="url(#' + id + 'can)"/>';  // край корпусу (мінус!)
+        o += '<circle cx="' + x + '" cy="' + y + '" r="' + (R * 0.74) + '" fill="none" stroke="#c8742c" stroke-width="' + (R * 0.16) + '"/>'; // ізолятор
+        o += '<circle cx="' + x + '" cy="' + y + '" r="' + (R * 0.5) + '" fill="url(#' + id + 'cap)" stroke="#8d969c" stroke-width=".6"/>'; // кришка «+»
+      } else {
+        o += '<circle cx="' + x + '" cy="' + y + '" r="' + (R * 0.88) + '" fill="url(#' + id + 'can)" stroke="#6d777d" stroke-width=".6"/>'; // денце «−»
+      }
+    }
+  }
+  // 2) стрічки: вздовж кожної групи + перемички по рядах між групами, з'єднаними на цьому торці
+  for (g = 0; g < S; g++) {
+    var x0 = cx(g);
+    o += '<rect x="' + (x0 - sw / 2) + '" y="' + (cy(0) - R * 0.55) + '" width="' + sw + '" height="' + (cy(P - 1) - cy(0) + R * 1.1) + '" rx="1.5" fill="url(#' + id + 'niv)" stroke="#7d878e" stroke-width=".6" opacity=".96"/>';
+  }
+  for (g = 0; g < S - 1; g++) {
+    if (!bridged(g)) continue;
+    var xa = Math.min(cx(g), cx(g + 1)), xb = Math.max(cx(g), cx(g + 1));
+    for (p = 0; p < P; p++) {
+      o += '<rect x="' + (xa - sw * 0.35) + '" y="' + (cy(p) - sw / 2) + '" width="' + (xb - xa + sw * 0.7) + '" height="' + sw + '" rx="1.5" fill="url(#' + id + 'ni)" stroke="#7d878e" stroke-width=".6" opacity=".96"/>';
+      if (layers > 1 && p === 0) o += '<text x="' + ((xa + xb) / 2) + '" y="' + (cy(p) + 4) + '" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="700" fill="#1d2329">×' + layers + "</text>";
+    }
+  }
+  // 3) точки зварювання: 2 пари на кожен контакт
+  for (g = 0; g < S; g++) {
+    for (p = 0; p < P; p++) {
+      x = cx(g); y = cy(p);
+      var dx = Math.min(sw * 0.28, 4.2), dy = 4.2;
+      [[-dx, -dy], [dx, -dy], [-dx, dy], [dx, dy]].forEach(function (q) {
+        o += '<circle cx="' + (x + q[0]) + '" cy="' + (y + q[1]) + '" r="1.5" fill="#2b2f33"/>';
+      });
+      var c = groups[g] && groups[g][p];
+      if (c) o += '<text x="' + (x + R * 0.62) + '" y="' + (y + R * 0.86) + '" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="700" fill="#fff" stroke="rgba(0,0,0,.6)" stroke-width="2.4" paint-order="stroke">' + c.id + "</text>";
+    }
+  }
+  // 4) підписи груп і полярності
+  for (g = 0; g < S; g++) {
+    var pl = plusOnFace(g);
+    o += '<text x="' + cx(g) + '" y="' + (top - 26) + '" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="600" fill="' + COLORS[g % COLORS.length] + '">Г' + (g + 1) + "</text>";
+    o += '<text x="' + cx(g) + '" y="' + (top - 13) + '" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="700" fill="' + (pl ? "#d32f2f" : ink) + '">' + (pl ? "+" : "−") + "</text>";
+  }
+  // 5) балансувальні точки та силові виводи
+  function tap(x, y, label) {
+    return '<circle cx="' + x + '" cy="' + y + '" r="4.2" fill="#f4c430" stroke="#9a7a10"/>' +
+      '<text x="' + x + '" y="' + (y + P * 0 + 16 + (P * d)) + '" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="' + muted + '"></text>' +
+      '<text x="' + x + '" y="' + (top + P * d + 22) + '" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="' + ink + '">' + label + "</text>";
+  }
+  var yb = cy(P - 1) + R * 0.55 - 2;
+  for (g = 0; g < S - 1; g++) if (bridged(g)) o += tap((cx(g) + cx(g + 1)) / 2, cy(P - 1), "B" + (g + 1));
+  function lead(g, color, label) {
+    var x = cx(g), y = cy(0), out = (col(g) === 0) ? padX - 82 : W - 10;
+    var x2 = col(g) === 0 ? padX - 10 : W - padX + 10;
+    o += '<line x1="' + x + '" y1="' + y + '" x2="' + (col(g) === 0 ? padX - 60 : W - padX + 60) + '" y2="' + y + '" stroke="' + color + '" stroke-width="6" stroke-linecap="round"/>';
+    o += '<text x="' + (col(g) === 0 ? 6 : W - 6) + '" y="' + (y - 10) + '" text-anchor="' + (col(g) === 0 ? "start" : "end") + '" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="700" fill="' + (color === "#222" ? ink : color) + '">' + label + "</text>";
+  }
+  if (!plusOnFace(0)) {   // мінус першої групи на цьому торці → B−
+    lead(0, "#222", "B−");
+    o += tap(cx(0), yb, "B0");
+  }
+  if (plusOnFace(S - 1)) { // плюс останньої групи на цьому торці → B+
+    lead(S - 1, "#d32f2f", "B+");
+    o += tap(cx(S - 1), yb, "B" + S);
+  }
+  return o + "</svg>";
+}
+
+// ---------- Копіювання ----------
+function copyCSV() {
+  if (!state.groups.length) { $("copied").textContent = "Спершу підберіть групи."; return; }
+  var lines = ["Група;Комірки;Сума мА·год"];
+  state.groups.forEach(function (g, i) {
+    lines.push((i + 1) + ";" + g.map(function (c) { return c.id; }).join(" ") + ";" + g.reduce(function (s, c) { return s + c.cap; }, 0));
+  });
+  var text = lines.join("\n");
+  var done = function () { $("copied").textContent = "Скопійовано"; setTimeout(function () { $("copied").textContent = ""; }, 2500); };
+  try {
+    navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+  } catch (e) { fallbackCopy(text, done); }
+}
+function fallbackCopy(text, done) {
+  var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) { $("copied").textContent = "Не вдалося скопіювати: виділіть таблицю вручну."; }
+  ta.remove();
+}
+
+// ---------- Приклад даних ----------
+function example(S, P) {
+  var rand = rng(2026), lines = ["// ПРИКЛАД: 50E з тестера (ємність мА·год, опір мОм, напруга В)"];
+  var n = S * P + 4;
+  for (var i = 1; i <= n; i++) {
+    var cap = Math.round(4830 + rand() * 190 + (i === 7 ? -420 : 0));
+    var ir = (12.5 + rand() * 3 + (i === 23 ? 9 : 0)).toFixed(1);
+    var v = (3.60 + rand() * 0.04).toFixed(2);
+    lines.push("#" + i + " " + cap + " " + ir + " " + v);
+  }
+  return lines.join("\n");
+}
+
+// ---------- Збереження (лише в цьому браузері) ----------
+var FIELDS = ["preset", "cap", "amax", "vnom", "vmax", "vmin", "mass", "S", "P", "iload", "derate", "capTol", "irTol", "niMat", "niStrip", "niSpots", "sizeBy", "cells"];
+function save() {
+  try { var o = {}; FIELDS.forEach(function (f) { o[f] = $(f).value; }); localStorage.setItem("akb21700", JSON.stringify(o)); } catch (e) {}
+}
+function load() {
+  try { var o = JSON.parse(localStorage.getItem("akb21700") || "null"); if (o) { FIELDS.forEach(function (f) { if (o[f] !== undefined) $(f).value = o[f]; }); return true; } } catch (e) {}
+  return false;
+}
+
+function applyPreset(id) {
+  var p = PRESETS.find(function (x) { return x.id === id; }) || PRESETS[0];
+  if (p.id !== "custom") { $("cap").value = p.cap; $("amax").value = p.amax; $("vnom").value = p.vnom; $("vmax").value = p.vmax; $("vmin").value = p.vmin; $("mass").value = p.mass; }
+  $("presetNote").textContent = p.note;
+}
+
+// ---------- Ініціалізація ----------
+PRESETS.forEach(function (p) { var o = document.createElement("option"); o.value = p.id; o.textContent = p.name + (p.id !== "custom" ? " · " + p.cap + " мА·год · " + p.amax + " А" : ""); $("preset").appendChild(o); });
+MATERIALS.forEach(function (m) { var o = document.createElement("option"); o.value = m.id; o.textContent = m.label; $("niMat").appendChild(o); });
+STRIPS.forEach(function (x) { var o = document.createElement("option"); o.value = x.id; o.textContent = x.label; $("niStrip").appendChild(o); });
+$("niStrip").value = "0.15x8";
+S_PRESETS.forEach(function (sp) {
+  var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.dataset.s = sp[0];
+  b.textContent = sp[0] + "S · " + sp[1]; b.addEventListener("click", function () { $("S").value = sp[0]; render(); });
+  $("sPresets").appendChild(b);
+});
+if (!load()) {
+  $("preset").value = "50E"; applyPreset("50E");
+  $("S").value = 13; $("P").value = 4; $("iload").value = 25; $("derate").value = 70;
+  $("cells").value = example(13, 4);
+} else {
+  var cur = PRESETS.find(function (x) { return x.id === $("preset").value; }); $("presetNote").textContent = cur ? cur.note : "";
+}
+$("preset").addEventListener("change", function () { applyPreset(this.value); render(); });
+["niMat", "niStrip", "sizeBy"].forEach(function (f) { $(f).addEventListener("change", render); });
+$("niSpots").addEventListener("input", render);
+["cap", "amax", "vnom", "vmax", "vmin", "mass", "S", "P", "iload", "derate", "capTol", "irTol"].forEach(function (f) { $(f).addEventListener("input", render); });
+$("cells").addEventListener("input", function () { clearTimeout(window.__t); window.__t = setTimeout(render, 400); });
+$("btnMatch").addEventListener("click", render);
+$("btnExample").addEventListener("click", function () { $("cells").value = example(Math.round(num("S")) || 13, Math.round(num("P")) || 4); render(); });
+$("btnClear").addEventListener("click", function () { $("cells").value = ""; render(); $("cells").focus(); });
+$("btnCopy").addEventListener("click", copyCSV);
+render();
+</script>
+<script>
+(function () {
+  if ("serviceWorker" in navigator && window.isSecureContext) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  }
+  var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var standalone = navigator.standalone === true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+  var seen = false; try { seen = localStorage.getItem("akb-install-hint") === "1"; } catch (e) {}
+  if (!ios || standalone || seen) return;
+  var el = document.createElement("div"); el.className = "install-hint"; el.setAttribute("role", "note");
+  el.innerHTML = '<p>Встановіть як додаток: натисніть <svg width="16" height="16" viewBox="0 0 24 24" aria-label="Поділитися"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> «Поділитися», потім <b>«На екран "Додому"»</b>.</p><button type="button">Зрозуміло</button>';
+  el.querySelector("button").addEventListener("click", function () { el.remove(); try { localStorage.setItem("akb-install-hint", "1"); } catch (e) {} });
+  document.body.appendChild(el);
+})();
+</script>
+</body>
+</html>
